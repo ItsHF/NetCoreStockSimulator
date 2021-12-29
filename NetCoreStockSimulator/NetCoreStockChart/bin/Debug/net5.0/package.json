@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "name": "asp.net",
+  "private": true,
+  "prepublish": [
+    "npm install",
+    "gulp clean",
+    "gulp min"
+  ],
+  "devDependencies": {
+    "gulp": "3.9.1",
+    "moment": "2.22.1",
+    "lodash": "4.17.10",
+    yahoo-
+  }
+}
