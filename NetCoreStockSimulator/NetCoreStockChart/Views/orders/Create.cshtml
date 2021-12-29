@@ -1,0 +1,89 @@
+﻿@model NetCoreStockChart.Models.order
+
+@{
+    ViewData["Title"] = "Order Create";
+}
+
+<h4>order</h4>
+<hr/>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" id="createform">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+             <label asp-for="User_Id" class="control-label"></label>
+             <select name="idUser" class="form-control" asp-items="ViewBag.Users"></select>
+            <div class="form-group">
+                <label asp-for="StockName" class="control-label"></label>
+                <input asp-for="StockName" class="form-control" />
+                <span asp-validation-for="StockName" class="text-danger"></span>
+                <button onclick="LoadStockPrice()" type="button" id="btnLoadPrice" class="btn btn-primary">Load Current Price</button>
+                 
+            </div>
+            <div class="form-group">
+                <label asp-for="quantity" class="control-label"></label>
+                <input id="quantity" asp-for="quantity" class="form-control" />
+                <span asp-validation-for="quantity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="currentprice" class="control-label"></label>
+                <input id="currentprice" name="currentprice" asp-for="currentprice" class="form-control" />
+                <span asp-validation-for="currentprice" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="paidamount" class="control-label"></label>
+                <input id="paidamount" name="paidamount" asp-for="paidamount" class="form-control" />
+                <span asp-validation-for="paidamount" class="text-danger"></span>
+                <button onclick="LoadPrice()" type="button" id="btnLoadPrice" class="btn btn-primary">Load Price</button>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" >
+        
+        
+
+        function LoadStockPrice() {
+          
+            var ticker = document.getElementById('StockName').value;
+           var toddate = new Date(Date.now());
+           var yestdate = new Date();
+           yestdate.setDate(yestdate.getDate() - 1);
+           todmotnh = toddate.getMonth()+1
+           
+           var todform = toddate.getFullYear()+'-'+ todmotnh+'-'+toddate.getDate();
+           var yestform = yestdate.getFullYear()+'-'+ todmotnh+'-'+yestdate.getDate();
+           console.log(todform);
+            console.log(yestform);
+                $.ajax({
+                    url: '/api/apiStockData/' + ticker + '/' + yestform + '/' + todform + '/daily',
+                    method: 'GET',
+                    dataType: 'json'
+                }).done(function (d) {
+                    d.forEach(function (di) {
+                        console.log(di.close);
+                        document.getElementById("currentprice").value = di.close;
+                    });
+                });             
+           }
+    </script>
+    <script type="text/javascript">
+     function LoadPrice() {
+
+                var quantity = document.getElementById('quantity').value;
+                var currpr = document.getElementById('currentprice').value;
+                var paidamount = quantity * currpr
+                document.getElementById("paidamount").value = paidamount;    
+        }
+    
+    </script>
+
+

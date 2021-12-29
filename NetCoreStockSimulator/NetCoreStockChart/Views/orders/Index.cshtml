@@ -1,0 +1,123 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<NetCoreStockChart.Models.order>
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    ViewData["Title"] = "Order Create";
+}
+
+
+
+<p>
+    <a asp-controller="orders" asp-action="Create"> Create New</a>
+</p>
+<body onload="WalletFunction()">
+<table class="table" id="table">
+    <thead>
+        <tr>
+           
+            <th>
+                @Html.DisplayNameFor(model => model.StockName)
+            </th>
+            <th>
+                Price When Bought
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.paidamount)
+            </th>
+            <th>
+                Current Price
+            </th>
+            <th>
+                Variation
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="tablebody" >
+@foreach (var item in Model) {
+@if(UserManager.GetUserId(User) == item.User_Id){
+        <tr>  
+            <td>
+                @Html.DisplayFor(modelItem => item.StockName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.currentprice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.quantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.paidamount)
+            </td>
+            <td></td>
+            <td></td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+}
+    </tbody>
+</table>
+</body>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" >
+        
+        
+
+        function WalletFunction() {
+          
+        
+           var toddate = new Date(Date.now());
+           var yestdate = new Date();
+           yestdate.setDate(yestdate.getDate() - 1);
+           todmotnh = toddate.getMonth()+1
+           
+           var todform = toddate.getFullYear()+'-'+ todmotnh+'-'+toddate.getDate();
+           var yestform = yestdate.getFullYear()+'-'+ todmotnh+'-'+yestdate.getDate();
+              
+        var body = document.getElementById("tablebody");
+       
+        
+       var Row = body.getElementsByTagName("tr");
+       
+       for (let i = 0; i < Row.length; i++) {
+        var Cells = Row[i].getElementsByTagName("td");
+        
+        var ticker = Cells[0].innerText;
+        
+                $.ajax({
+                    url: '/api/apiStockData/' + ticker + '/' + yestform + '/' + todform + '/daily',
+                    method: 'GET',
+                    async: false,
+                    dataType: 'json'
+                }).done(function (d) {
+                    d.forEach(function (di) {
+                        console.log(di.close);
+                        Cells[4].innerText = di.close;
+                        console.log(Cells[4].innerText);
+                console.log( Cells[2].innerText);
+                console.log(Cells[3].innerText);
+                
+        Cells[5].innerText = Cells[4].innerText * Cells[2].innerText - Cells[3].innerText;
+        if(Cells[5].innerText > 0){
+        Cells[5].style.color="green";
+        }
+        else if(Cells[5].innerText < 0)
+        {
+        Cells[5].style.color="red";
+        }
+                    });
+                });    
+                    
+        };
+        }
+
+    </script>
